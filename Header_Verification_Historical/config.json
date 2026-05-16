@@ -1,0 +1,50 @@
+{
+  "input_dir": "../1_input",
+  "metadata_dir": "../2_metadata",
+  "skip_sheets": {
+    "exact": [
+      "index",
+      "summary",
+      "hyperlinks",
+      "deviation",
+      "disclosure of yield to call",
+      "quants data",
+      "qunats data",
+      "xdo_metadata",
+      "sheet1",
+      "ytm",
+      "common notes",
+      "common note",
+      "scheme",
+      "annexure b",
+      "yield - basel iii bonds",
+      "dividend details",
+      "nav details",
+      "scheme name",
+      "ovr",
+      "idcw details",
+      "dividend history",
+      "debt index replication factor"
+    ],
+    "contains": [
+      "riskometer",
+      "risk-o-meter"
+    ],
+    "regex": [
+      "^\\d+$",
+      "^sheet\\d+$"
+    ]
+  },
+  "skip_hierarchies": {
+    "exact": [],
+    "contains": [
+      "riskometer",
+      "note -",
+      "for latest"
+    ],
+    "regex": []
+  },
+  "amcs": {
+    "DSP": "DSP.json"
+  }
+}

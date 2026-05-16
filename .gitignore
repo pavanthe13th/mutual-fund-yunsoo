@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+interview_assignment/submissions/candidate_output/
+interview_assignment/evaluator/_runs/

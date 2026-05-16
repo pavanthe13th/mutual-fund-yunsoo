@@ -1,0 +1,109 @@
+name: Request Evaluation
+
+on:
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  request-eval:
+    if: ${{ github.event.issue.pull_request && startsWith(github.event.comment.body, '/eval') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate requester and load PR context
+        id: pr_ctx
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const association = String(context.payload.comment.author_association || "").toUpperCase();
+            const allowed = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
+            if (!allowed.has(association)) {
+              core.setFailed(`'/eval' is allowed only for repository collaborators. Association: ${association || "UNKNOWN"}`);
+              return;
+            }
+
+            const prNumber = Number(context.payload.issue.number);
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            if (String(pr.state).toLowerCase() !== "open") {
+              core.setFailed(`PR #${prNumber} is not open.`);
+              return;
+            }
+
+            core.setOutput("candidate_repo", `${context.repo.owner}/${context.repo.repo}`);
+            core.setOutput("pr_number", String(prNumber));
+            core.setOutput("request_actor", context.payload.comment.user.login);
+
+      - name: Validate dispatch secret
+        run: |
+          if [[ -z "${{ secrets.EVAL_DISPATCH_TOKEN }}" ]]; then
+            echo "Missing secret EVAL_DISPATCH_TOKEN. Cannot dispatch evaluator request."
+            exit 1
+          fi
+
+      - name: Dispatch evaluation request
+        uses: actions/github-script@v7
+        env:
+          CONTROLLER_REPO: ${{ vars.EVAL_CONTROLLER_REPO }}
+          CONTROLLER_WORKFLOW: ${{ vars.EVAL_CONTROLLER_WORKFLOW }}
+          CONTROLLER_REF: ${{ vars.EVAL_CONTROLLER_REF }}
+          CANDIDATE_REPO: ${{ steps.pr_ctx.outputs.candidate_repo }}
+          PR_NUMBER: ${{ steps.pr_ctx.outputs.pr_number }}
+          REQUEST_ACTOR: ${{ steps.pr_ctx.outputs.request_actor }}
+        with:
+          github-token: ${{ secrets.EVAL_DISPATCH_TOKEN }}
+          script: |
+            const fallbackRepo = "pavanthe13th/mf-eval-state";
+            const controllerRepo = String(process.env.CONTROLLER_REPO || fallbackRepo).trim() || fallbackRepo;
+            const [owner, repo] = controllerRepo.split("/");
+            const workflowId = String(process.env.CONTROLLER_WORKFLOW || "evaluate-candidates.yml").trim();
+            const workflowRef = String(process.env.CONTROLLER_REF || "main").trim() || "main";
+
+            if (!owner || !repo) {
+              core.setFailed(`Invalid controller repo '${controllerRepo}'.`);
+              return;
+            }
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id: workflowId,
+              ref: workflowRef,
+              inputs: {
+                candidate_repo: process.env.CANDIDATE_REPO,
+                pr_number: String(process.env.PR_NUMBER),
+                request_actor: process.env.REQUEST_ACTOR
+              }
+            });
+
+      - name: Acknowledge on PR
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.pr_ctx.outputs.pr_number }}
+          REQUEST_ACTOR: ${{ steps.pr_ctx.outputs.request_actor }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = [
+              "Evaluation request queued.",
+              `Requested by: @${process.env.REQUEST_ACTOR}`,
+              "The private controller will post/update the `evaluate` status and PR result comment."
+            ].join("\n");
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: Number(process.env.PR_NUMBER),
+              body
+            });

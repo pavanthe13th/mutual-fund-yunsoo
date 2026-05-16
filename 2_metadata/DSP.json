@@ -1,0 +1,304 @@
+{
+  "date_pattern": "as on (\\w+ \\d{1,2}, \\d{4})",
+  "date_capture_group": 1,
+  "fund_name_source": {
+    "type": "sheet_row",
+    "row": 0,
+    "name_col": 1,
+    "skip_values": [
+      "Portfolio as on"
+    ]
+  },
+  "fund_code_source": {
+    "type": "sheet_name"
+  },
+  "category_overrides": [
+    {
+      "pattern": "This scheme has exposure to",
+      "match_field": "instrument_name",
+      "exclude": true
+    },
+    {
+      "pattern": "This scheme has exposure to",
+      "match_field": "security_name",
+      "exclude": true
+    },
+    {
+      "pattern": "TREPS",
+      "match_field": "instrument_name",
+      "exclude": true
+    },
+    {
+      "pattern": "TREPS / Reverse Repo Investments / Corporate Debt Repo",
+      "match_field": "instrument_name",
+      "category": "TREPS / Reverse Repo Investments / Corporate Debt Repo"
+    },
+    {
+      "pattern": "TREPS / Reverse Repo Investments",
+      "match_field": "instrument_name",
+      "category": "TREPS / Reverse Repo Investments"
+    }
+  ],
+  "table_structures": [
+    {
+      "name": "regular_holdings",
+      "header_columns": [
+        {
+          "index": 0,
+          "output_name": "sr_no",
+          "input_name": "Sr. No."
+        },
+        {
+          "index": 1,
+          "output_name": "instrument_name",
+          "input_name": "Name of Instrument"
+        },
+        {
+          "index": 2,
+          "output_name": "isin",
+          "input_name": "ISIN"
+        },
+        {
+          "index": 3,
+          "output_name": "rating_industry",
+          "input_name": "Rating/Industry"
+        },
+        {
+          "index": 4,
+          "output_name": "quantity",
+          "input_name": "Quantity"
+        },
+        {
+          "index": 5,
+          "output_name": "market_value",
+          "input_name": "Market value (Rs. In lakhs)"
+        },
+        {
+          "index": 6,
+          "output_name": "percent_to_nav",
+          "input_name": "% to Net Assets"
+        },
+        {
+          "index": 7,
+          "output_name": "maturity_date",
+          "input_name": "Maturity Date"
+        },
+        {
+          "index": 8,
+          "output_name": "put_call_option",
+          "input_name": "Put/Call Option"
+        },
+        {
+          "index": 9,
+          "output_name": "ytm",
+          "input_name": "YTM (%)"
+        }
+      ],
+      "table_end_keywords": [
+        "Grand Total"
+      ],
+      "exclude_output_columns": [
+        "sr_no"
+      ],
+      "net_receivables_text": "Net Receivables/Payables",
+      "net_receivables_instrument_type": "Cash & Cash Equivalent",
+      "vertical_hierarchy": [
+        {
+          "instrument_type": "DEBT INSTRUMENTS",
+          "children": [
+            {
+              "category_type": "BOND & NCD's",
+              "end_keywords": [
+                "Total"
+              ],
+              "children": [
+                {
+                  "subcategory_type": "Listed / awaiting listing on the stock exchanges",
+                  "end_keywords": [
+                    "Total"
+                  ]
+                }
+              ]
+            },
+            {
+              "category_type": "Government Securities (Central/State)",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Securitised Debt",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Unlisted",
+              "end_keywords": [
+                "Total"
+              ]
+            }
+          ]
+        },
+        {
+          "instrument_type": "EQUITY & EQUITY RELATED",
+          "children": [
+            {
+              "category_type": "Listed / awaiting listing on the stock exchanges",
+              "end_keywords": [
+                "Total"
+              ]
+            }
+          ]
+        },
+        {
+          "instrument_type": "Units issued by REITs & InvITs",
+          "children": [
+            {
+              "category_type": "Listed / awaiting listing on the stock exchanges",
+              "end_keywords": [
+                "Total"
+              ]
+            }
+          ]
+        },
+        {
+          "instrument_type": "MONEY MARKET INSTRUMENTS",
+          "children": [
+            {
+              "category_type": "Certificate of Deposit",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Commercial Papers",
+              "end_keywords": [
+                "Total"
+              ],
+              "children": [
+                {
+                  "subcategory_type": "Listed / awaiting listing on the stock exchanges",
+                  "end_keywords": [
+                    "Total"
+                  ]
+                }
+              ]
+            },
+            {
+              "category_type": "Treasury Bill",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Alternative Investment Funds (AIF)",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Mutual Funds",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "TREPS / Reverse Repo Investments",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "TREPS / Reverse Repo Investments / Corporate Debt Repo",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Cash Management Bill",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Fixed Deposit",
+              "end_keywords": [
+                "Total"
+              ]
+            }
+          ]
+        },
+        {
+          "instrument_type": "DERIVATIVES",
+          "end_keywords": [
+            "Total"
+          ]
+        },
+        {
+          "instrument_type": "OTHERS",
+          "end_keywords": [
+            "Total"
+          ],
+          "children": [
+            {
+              "category_type": "Overseas Mutual Fund",
+              "end_keywords": [
+                "Total"
+              ]
+            },
+            {
+              "category_type": "Overseas Mutual Funds",
+              "end_keywords": [
+                "Total"
+              ]
+            }
+          ]
+        },
+        {
+          "instrument_type": "Cash & Cash Equivalent",
+          "end_keywords": [
+            "Total"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "defaulted_securities_disclosure",
+      "table_end_keywords": [
+        "GRAND TOTAL",
+        "Scheme Riskometer",
+        "Riskometer"
+      ],
+      "default_instrument_type": "Defaulted Securities",
+      "header_columns": [
+        {
+          "index": 1,
+          "output_name": "security_name",
+          "input_name": "Security Name"
+        },
+        {
+          "index": 2,
+          "output_name": "isin",
+          "input_name": "ISIN"
+        },
+        {
+          "index": 3,
+          "output_name": "value_under_net_receivables_absolute",
+          "input_name": "value of the security considered under net receivables"
+        },
+        {
+          "index": 4,
+          "output_name": "value_under_net_receivables_percent",
+          "input_name": "% to NAV"
+        },
+        {
+          "index": 5,
+          "output_name": "total_amount_due",
+          "input_name": "total amount (including principal and interest)"
+        }
+      ],
+      "vertical_hierarchy": []
+    }
+  ]
+}
